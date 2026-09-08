@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from langgraph.graph import END, StateGraph
 
@@ -7,6 +7,7 @@ from app.agents.static_analysis_agent import run_static_analysis_agent
 from app.agents.style_agent import run_style_agent
 from app.agents.summarizer_agent import run_summarizer
 from app.domain.github.client import get_py_filenames
+from app.domain.github.review_publisher import publish_review
 
 
 class ReviewState(TypedDict):
@@ -15,11 +16,12 @@ class ReviewState(TypedDict):
     pr_title: str
     pr_body: str
     py_filenames: list[str]
-    static_result: str | None
-    style_result: str | None
-    security_result: str | None
-    final_summary: str | None
-    skip_reason: str | None
+    static_result: Optional[str]
+    style_result: Optional[str]
+    security_result: Optional[str]
+    final_summary: Optional[str]
+    skip_reason: Optional[str]
+    publish_result: Optional[dict]
 
 
 def gather_context_node(state: ReviewState) -> ReviewState:
@@ -77,6 +79,18 @@ def skip_node(state: ReviewState) -> ReviewState:
     return {**state, "final_summary": f"**Verdict: SKIPPED**\n\n{state['skip_reason']}"}
 
 
+async def publish_node(state: ReviewState) -> ReviewState:
+    pr = state["pr"]
+    repo = state["repo"]
+    result = await publish_review(
+        repo_full_name=repo.full_name,
+        pr_number=pr.number,
+        head_sha=pr.head.sha,
+        summary_text=state["final_summary"],
+    )
+    return {**state, "publish_result": result}
+
+
 def build_review_graph():
     graph_builder = StateGraph(ReviewState)
 
@@ -87,6 +101,7 @@ def build_review_graph():
     graph_builder.add_node("security", security_node)
     graph_builder.add_node("summarizer", summarizer_node)
     graph_builder.add_node("skip", skip_node)
+    graph_builder.add_node("publish", publish_node)
 
     graph_builder.set_entry_point("gather_context")
     graph_builder.add_edge("gather_context", "supervisor")
@@ -101,8 +116,9 @@ def build_review_graph():
     graph_builder.add_edge("style", "security")
     graph_builder.add_edge("security", "summarizer")
 
-    graph_builder.add_edge("summarizer", END)
-    graph_builder.add_edge("skip", END)
+    graph_builder.add_edge("summarizer", "publish")
+    graph_builder.add_edge("skip", "publish")
+    graph_builder.add_edge("publish", END)
 
     return graph_builder.compile()
 
