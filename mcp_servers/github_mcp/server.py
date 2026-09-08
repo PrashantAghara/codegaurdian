@@ -6,7 +6,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from mcp.server.fastmcp import FastMCP
 
-from app.domain.github.client import get_repo
+from app.domain.github.client import get_repo, get_repo_as_app
 
 mcp = FastMCP("codeguardian-github", host="127.0.0.1", port=8001)
 
@@ -43,7 +43,7 @@ def create_check_run(
     repo_full_name: str, head_sha: str, conclusion: str, title: str, summary: str
 ) -> dict:
     """Create a check run on a commit. conclusion must be one of: success, failure, neutral, action_required."""
-    repo = get_repo(repo_full_name)
+    repo = get_repo_as_app(repo_full_name)
     check = repo.create_check_run(
         name="CodeGuardian Review",
         head_sha=head_sha,

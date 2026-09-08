@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
@@ -16,12 +16,12 @@ class ReviewState(TypedDict):
     pr_title: str
     pr_body: str
     py_filenames: list[str]
-    static_result: Optional[str]
-    style_result: Optional[str]
-    security_result: Optional[str]
-    final_summary: Optional[str]
-    skip_reason: Optional[str]
-    publish_result: Optional[dict]
+    static_result: str | None
+    style_result: str | None
+    security_result: str | None
+    final_summary: str | None
+    skip_reason: str | None
+    publish_result: dict | None
 
 
 def gather_context_node(state: ReviewState) -> ReviewState:
