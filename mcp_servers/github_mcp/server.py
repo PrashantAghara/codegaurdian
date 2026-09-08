@@ -8,7 +8,7 @@ from mcp.server.fastmcp import FastMCP
 
 from app.domain.github.client import get_repo
 
-mcp = FastMCP("codeguardian-github")
+mcp = FastMCP("codeguardian-github", host="127.0.0.1", port=8001)
 
 
 @mcp.tool()
@@ -55,4 +55,4 @@ def create_check_run(
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(transport="streamable-http")
