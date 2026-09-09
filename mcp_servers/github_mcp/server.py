@@ -6,7 +6,10 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from mcp.server.fastmcp import FastMCP
 
+from app.core.logging_config import setup_logging
 from app.domain.github.client import get_repo, get_repo_as_app
+
+setup_logging()
 
 mcp = FastMCP("codeguardian-github", host="127.0.0.1", port=8001)
 
