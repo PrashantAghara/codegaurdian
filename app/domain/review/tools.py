@@ -16,6 +16,7 @@ def _run_ruff_on_file(full_content: str) -> list[dict]:
         tmp_path = tmp.name
     result = subprocess.run(
         ["ruff", "check", tmp_path, "--output-format=json"],
+        check=False,
         capture_output=True,
         text=True,
     )
@@ -61,7 +62,7 @@ def _run_bandit_on_file(full_content: str) -> list[dict]:
         tmp.write(full_content)
         tmp_path = tmp.name
     result = subprocess.run(
-        ["bandit", "-f", "json", tmp_path], capture_output=True, text=True
+        ["bandit", "-f", "json", tmp_path], check=False, capture_output=True, text=True
     )
     os.unlink(tmp_path)
     try:
