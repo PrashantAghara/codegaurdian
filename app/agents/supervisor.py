@@ -8,6 +8,11 @@ from app.agents.style_agent import run_style_agent
 from app.agents.summarizer_agent import run_summarizer
 from app.domain.github.client import get_py_filenames
 from app.domain.github.review_publisher import publish_review
+from app.domain.review.findings import (
+    collect_security_findings,
+    collect_static_findings,
+    collect_style_findings,
+)
 
 
 class ReviewState(TypedDict):
@@ -19,6 +24,7 @@ class ReviewState(TypedDict):
     static_result: str | None
     style_result: str | None
     security_result: str | None
+    findings: list[dict] | None
     final_summary: str | None
     skip_reason: str | None
     publish_result: dict | None
@@ -64,6 +70,18 @@ def security_node(state: ReviewState) -> ReviewState:
     return {**state, "security_result": result}
 
 
+def collect_findings_node(state: ReviewState) -> ReviewState:
+    findings = []
+    findings += collect_static_findings(
+        state["pr"], state["repo"], state["py_filenames"]
+    )
+    findings += collect_security_findings(
+        state["pr"], state["repo"], state["py_filenames"]
+    )
+    findings += collect_style_findings(state["pr"], state["style_result"])
+    return {**state, "findings": findings}
+
+
 def summarizer_node(state: ReviewState) -> ReviewState:
     result = run_summarizer(
         pr_title=state["pr_title"],
@@ -87,6 +105,7 @@ async def publish_node(state: ReviewState) -> ReviewState:
         pr_number=pr.number,
         head_sha=pr.head.sha,
         summary_text=state["final_summary"],
+        findings=state.get("findings") or [],
     )
     return {**state, "publish_result": result}
 
@@ -99,6 +118,7 @@ def build_review_graph():
     graph_builder.add_node("static_analysis", static_analysis_node)
     graph_builder.add_node("style", style_node)
     graph_builder.add_node("security", security_node)
+    graph_builder.add_node("collect_findings", collect_findings_node)
     graph_builder.add_node("summarizer", summarizer_node)
     graph_builder.add_node("skip", skip_node)
     graph_builder.add_node("publish", publish_node)
@@ -114,7 +134,8 @@ def build_review_graph():
 
     graph_builder.add_edge("static_analysis", "style")
     graph_builder.add_edge("style", "security")
-    graph_builder.add_edge("security", "summarizer")
+    graph_builder.add_edge("security", "collect_findings")
+    graph_builder.add_edge("collect_findings", "summarizer")
 
     graph_builder.add_edge("summarizer", "publish")
     graph_builder.add_edge("skip", "publish")

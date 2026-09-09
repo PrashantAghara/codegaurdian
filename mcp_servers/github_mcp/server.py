@@ -57,5 +57,21 @@ def create_check_run(
     return {"check_run_id": check.id, "url": check.html_url}
 
 
+@mcp.tool()
+def create_pr_review(
+    repo_full_name: str, pr_number: int, body: str, comments: list[dict]
+) -> dict:
+    """Submit a PR review with a body and inline comments anchored to specific file/line locations.
+    Each comment dict needs: path, line, body. Always submitted as event=COMMENT (not APPROVE/REQUEST_CHANGES)
+    to avoid GitHub's restriction on self-reviewing your own PR."""
+    repo = get_repo(repo_full_name)
+    pr = repo.get_pull(pr_number)
+    review = pr.create_review(body=body, event="COMMENT", comments=comments)
+    return {
+        "review_id": review.id,
+        "url": f"{pr.html_url}#pullrequestreview-{review.id}",
+    }
+
+
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")
