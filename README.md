@@ -1,2 +1,2 @@
 # codegaurdian
-AI Code review Agent with Voice functionality - Built with Langgraph and Langchain
+AI Code review Agent - Built with Langgraph and Langchain
