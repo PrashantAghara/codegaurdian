@@ -1,3 +1,4 @@
+import base64
 import re
 from functools import lru_cache
 
@@ -66,8 +67,13 @@ def get_py_filenames(pr) -> list[str]:
 def _get_app_private_key() -> str:
     global _app_private_key_cache
     if _app_private_key_cache is None:
-        with open(settings.github_app_private_key_path, "r") as f:
-            _app_private_key_cache = f.read()
+        if settings.github_app_private_key_b64:
+            _app_private_key_cache = base64.b64decode(
+                settings.github_app_private_key_b64
+            ).decode("utf-8")
+        else:
+            with open(settings.github_app_private_key_path, "r") as f:
+                _app_private_key_cache = f.read()
     return _app_private_key_cache
 
 

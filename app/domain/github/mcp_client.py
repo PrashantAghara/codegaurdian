@@ -1,9 +1,11 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
+from app.core.config import settings
+
 _client = MultiServerMCPClient(
     {
         "github": {
-            "url": "http://127.0.0.1:8001/mcp",
+            "url": settings.mcp_server_url,
             "transport": "streamable_http",
         }
     }
