@@ -1,3 +1,5 @@
+import os
+
 from astrapy import DataAPIClient
 from langchain_huggingface import HuggingFaceEmbeddings
 
@@ -8,6 +10,7 @@ _collection = None
 
 
 def get_embeddings():
+    os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN")
     global _embeddings
     if _embeddings is None:
         _embeddings = HuggingFaceEmbeddings(

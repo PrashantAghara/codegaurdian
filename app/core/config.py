@@ -12,8 +12,10 @@ class Settings(BaseSettings):
     langfuse_host: str = "https://cloud.langfuse.com"
     github_app_id: str = ""
     github_app_private_key_path: str = ""
+    github_app_private_key_b64: str = ""
     github_webhook_secret: str = ""
     github_pat: str = ""
+    mcp_server_url: str = "http://127.0.0.1:8001/mcp"
     hf_token: str = ""
 
     class Config:
