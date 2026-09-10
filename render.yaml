@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: codeguardian-mcp
+    runtime: docker
+    dockerfilePath: ./Dockerfile.mcp
+    plan: free
+    envVars:
+      - key: MCP_HOST
+        value: 0.0.0.0
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GITHUB_PAT
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY_B64
+        sync: false
+      - key: ASTRA_DB_APPLICATION_TOKEN
+        sync: false
+      - key: ASTRA_DB_API_ENDPOINT
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+
+  - type: web
+    name: codeguardian-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: MCP_SERVER_URL
+        fromService:
+          name: codeguardian-mcp
+          type: web
+          property: hostport
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GITHUB_PAT
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY_B64
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+      - key: ASTRA_DB_APPLICATION_TOKEN
+        sync: false
+      - key: ASTRA_DB_API_ENDPOINT
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false

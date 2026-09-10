@@ -1,0 +1,24 @@
+services:
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    ports:
+      - "8001:8001"
+    environment:
+      - MCP_HOST=0.0.0.0
+    env_file:
+      - .env
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - MCP_SERVER_URL=http://mcp:8001/mcp
+    env_file:
+      - .env
+    depends_on:
+      - mcp

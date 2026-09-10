@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.gitignore
+cert/
+notebooks/
+scripts/
+*.ipynb
+README.md
