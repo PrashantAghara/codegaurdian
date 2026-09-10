@@ -32,9 +32,9 @@ def collect_static_findings(pr, repo, py_filenames: list[str]) -> list[dict]:
     return findings
 
 
-def collect_security_findings(pr, repo, py_filenames: list[str]) -> list[dict]:
+def collect_security_findings(pr, repo, filenames: list[str]) -> list[dict]:
     findings = []
-    for filename in py_filenames:
+    for filename in filenames:
         result = get_security_analysis_findings(pr, repo, filename)
         for f in result["findings"]:
             findings.append(
@@ -43,7 +43,7 @@ def collect_security_findings(pr, repo, py_filenames: list[str]) -> list[dict]:
                     "line": f["line"],
                     "severity": f["severity"],
                     "source": "security",
-                    "message": f"{f['issue']} ({f['test_id']})",
+                    "message": f"{f['issue']} ({f['check_id']})",
                 }
             )
     return findings

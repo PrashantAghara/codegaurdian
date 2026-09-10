@@ -1,5 +1,5 @@
+from langchain.agents import create_agent
 from langchain_groq import ChatGroq
-from langgraph.prebuilt import create_react_agent
 
 from app.core.config import settings
 from app.domain.review.tools import make_static_analysis_tool
@@ -10,10 +10,10 @@ _llm = ChatGroq(
 
 
 def run_static_analysis_agent(pr, repo, py_filenames: list[str]) -> str:
-    agent = create_react_agent(
+    agent = create_agent(
         model=_llm,
         tools=[make_static_analysis_tool(pr, repo)],
-        prompt=(
+        system_prompt=(
             "You are a Static Analysis Agent reviewing a pull request. "
             "Call static_analysis_tool once per given filename. "
             "When summarizing, use the EXACT 'location.row' value as the Line number — never estimate. "

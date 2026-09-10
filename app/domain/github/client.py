@@ -6,6 +6,28 @@ from github import Auth, Github, GithubIntegration
 
 _app_private_key_cache = None
 
+_SKIP_EXTENSIONS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".svg",
+    ".webp",
+    ".lock",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".txt",
+    ".zip",
+    ".pdf",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+}
+
 
 @lru_cache
 def get_github_client() -> Github:
@@ -59,3 +81,16 @@ def get_repo_as_app(full_name: str):
     access_token = integration.get_access_token(installation.id).token
     app_client = Github(auth=Auth.Token(access_token))
     return app_client.get_repo(full_name)
+
+
+def get_reviewable_filenames(pr) -> list[str]:
+    """All changed files worth security-scanning — broader than get_py_filenames since
+    Semgrep supports many languages, not just Python. Excludes binary/data/doc files
+    Semgrep can't meaningfully analyze anyway."""
+    from pathlib import Path
+
+    return [
+        f.filename
+        for f in pr.get_files()
+        if Path(f.filename).suffix.lower() not in _SKIP_EXTENSIONS
+    ]

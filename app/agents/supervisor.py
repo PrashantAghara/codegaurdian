@@ -66,17 +66,23 @@ def style_node(state: ReviewState) -> ReviewState:
 
 
 def security_node(state: ReviewState) -> ReviewState:
-    result = run_security_agent(state["pr"], state["repo"], state["py_filenames"])
+    from app.domain.github.client import get_reviewable_filenames
+
+    result = run_security_agent(
+        state["pr"], state["repo"], get_reviewable_filenames(state["pr"])
+    )
     return {**state, "security_result": result}
 
 
 def collect_findings_node(state: ReviewState) -> ReviewState:
+    from app.domain.github.client import get_reviewable_filenames
+
     findings = []
     findings += collect_static_findings(
         state["pr"], state["repo"], state["py_filenames"]
     )
     findings += collect_security_findings(
-        state["pr"], state["repo"], state["py_filenames"]
+        state["pr"], state["repo"], get_reviewable_filenames(state["pr"])
     )
     findings += collect_style_findings(state["pr"], state["style_result"])
     return {**state, "findings": findings}
