@@ -15,7 +15,7 @@ setup_logging()
 mcp = FastMCP(
     "codeguardian-github",
     host=os.environ.get("MCP_HOST", "127.0.0.1"),
-    port=int(os.environ.get("PORT", 8001)),
+    port=int(os.environ.get("PORT", 8001)),  # noqa: PLW1508
 )
 
 
