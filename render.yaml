@@ -36,7 +36,7 @@ services:
         fromService:
           name: codeguardian-mcp
           type: web
-          property: hostport
+          property: host
       - key: GROQ_API_KEY
         sync: false
       - key: GITHUB_PAT

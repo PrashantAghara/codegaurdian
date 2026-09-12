@@ -6,7 +6,7 @@ from app.core.config import settings
 def _normalize_mcp_url(raw: str) -> str:
     url = raw
     if not url.startswith("http://") and not url.startswith("https://"):
-        url = f"http://{url}"
+        url = f"https://{url}"
     if not url.rstrip("/").endswith("/mcp"):
         url = url.rstrip("/") + "/mcp"
     return url
