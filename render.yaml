@@ -19,12 +19,6 @@ services:
         sync: false
       - key: ASTRA_DB_API_ENDPOINT
         sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: LANGFUSE_PUBLIC_KEY
-        sync: false
-      - key: LANGFUSE_SECRET_KEY
-        sync: false
 
   - type: web
     name: codeguardian-api
@@ -50,12 +44,6 @@ services:
       - key: ASTRA_DB_APPLICATION_TOKEN
         sync: false
       - key: ASTRA_DB_API_ENDPOINT
-        sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: LANGFUSE_PUBLIC_KEY
-        sync: false
-      - key: LANGFUSE_SECRET_KEY
         sync: false
       - key: HF_TOKEN
         sync: false
