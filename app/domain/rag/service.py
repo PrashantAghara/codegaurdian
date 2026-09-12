@@ -1,7 +1,5 @@
-import os
-
 from astrapy import DataAPIClient
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from app.core.config import settings
 
@@ -10,11 +8,11 @@ _collection = None
 
 
 def get_embeddings():
-    os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN")
     global _embeddings
     if _embeddings is None:
-        _embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        _embeddings = HuggingFaceEndpointEmbeddings(
+            model="sentence-transformers/all-MiniLM-L6-v2",
+            huggingfacehub_api_token=settings.hf_token,
         )
     return _embeddings
 
